@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
+
+name: Trigger Cppcheck Upload
+on:
+  push:
+  pull_request:
+
+jobs:
+  cppcheck-upload:
+    name: Cppcheck Upload
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+      - uses: michael-herwig/cppcheck-upload@main
+        name: Upload

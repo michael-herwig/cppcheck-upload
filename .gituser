@@ -1,0 +1,10 @@
+[user]
+  name = Michael Herwig
+  email = develop@michael-herwig.de
+  signingkey = 3653D8BF91FD9894
+
+[commit]
+  gpgsign = true
+
+[tag]
+  gpgSign = true
