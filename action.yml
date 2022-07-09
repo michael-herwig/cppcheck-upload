@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: (c) 2022, Michael Herwig <contact@michael-herwig.de>
+
+name: 'Cppcheck Upload'
+description: 'GitHub Actions Check for Cppcheck .plist files.'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

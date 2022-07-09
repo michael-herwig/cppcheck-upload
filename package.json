@@ -1,0 +1,19 @@
+{
+  "name": "cppcheck-upload",
+  "version": "0.0.0",
+  "description": "GitHub Actions Check for Cppcheck .plist files.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:michael-herwig/cppcheck-upload.git"
+  },
+  "bugs": {
+    "url": "https://github.com/michael-herwig/cppcheck-upload/issues"
+  },
+  "author": "Michael Herwig <contact@michael-herwig.de>",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3"
+  }
+}
