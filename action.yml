@@ -8,8 +8,13 @@ runs:
   image: "Dockerfile"
   args:
     - --path=${{ inputs.path }}
+    - --token=${{ inputs.github-token }}
 inputs:
   path:
     description: Directory containing .plist files to upload.
     required: true
     default: ${{ github.workspace }}
+  github-token:
+    description: GitHub Access Token
+    required: true
+    default: ${{ github.token }}

@@ -15,7 +15,6 @@
   "dependencies": {
     "@actions/core": "^1.9.0",
     "@actions/github": "^5.0.3",
-    "@octokit/rest": "^19.0.3",
     "plist": "^3.0.5",
     "yargs": "^17.5.1"
   }

@@ -8,7 +8,6 @@ const args = require('yargs').argv;
 const fs = require('fs');
 const path = require('node:path');
 const plist = require('plist');
-const { Octokit } = require("@octokit/rest");
 
 async function collectPlistFiles(dir) {
   return await fs.promises.readdir(dir).then(async files => {
@@ -54,7 +53,8 @@ async function importPlist(file) {
       return await importPlist(file);
     })).then(annotations => { return annotations.flat(); });
 
-    await Octokit.rest.checks.create({
+    const octokit = github.getOctokit(args.token);
+    await octokit.rest.checks.create({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       name: 'Cppcheck Upload',
