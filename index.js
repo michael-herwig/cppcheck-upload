@@ -51,9 +51,11 @@ async function importPlist(file) {
 (async () => {
   try {
     const files = await collectPlistFiles(args.path);
+    core.info(`Found ${files.length} .plist files:\n - ${files.join('\n - ')}`);
     const annotations = await Promise.all(files.map(async (file) => {
       return await importPlist(file);
     })).then(annotations => { return annotations.flat(); });
+    core.info(`Found ${annotations.length} annotations:\n - ${annotations.map(annotation => annotation.title).join('\n - ')}`);
     const conclusion = files.length > 0 ? (annotations.length > 0 ? 'failure' : 'success') : 'skipped';
 
     const octokit = github.getOctokit(args.token);
@@ -62,7 +64,7 @@ async function importPlist(file) {
       repo: github.context.repo.repo,
       head_sha: github.context.sha,
 
-      name: 'Cppcheck Upload',
+      name: 'Cppcheck',
       status: 'completed',
       conclusion: conclusion,
 
