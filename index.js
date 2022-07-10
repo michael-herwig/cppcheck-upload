@@ -10,20 +10,22 @@ const path = require('node:path');
 const plist = require('plist');
 
 async function collectPlistFiles(dir) {
-  return await fs.promises.readdir(dir).then(async files => {
-    return await Promise.all(files.map(async file => {
-      const filepath = path.join(dir, file);
-      const filestats = await fs.promises.stat(filepath);
-      if (filestats.isFile()) {
-        if (filepath.endsWith('.plist')) {
-          return [filepath];
+  return await fs.promises.readdir(dir)
+    .catch(_ => { return []; })
+    .then(async files => {
+      return await Promise.all(files.map(async file => {
+        const filepath = path.join(dir, file);
+        const filestats = await fs.promises.stat(filepath);
+        if (filestats.isFile()) {
+          if (filepath.endsWith('.plist')) {
+            return [filepath];
+          }
+        } else if (filestats.isDirectory()) {
+          return await collectPlistFiles(filepath);
         }
-      } else if (filestats.isDirectory()) {
-        return await collectPlistFiles(filepath);
-      }
-      return [];
-    })).then(filelists => { return filelists.flat(); });
-  });
+        return [];
+      })).then(filelists => { return filelists.flat(); });
+    });
 }
 
 async function importPlist(file) {
