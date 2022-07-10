@@ -40,7 +40,7 @@ async function importPlist(file) {
         start_column: diagnostic.location.col,
         end_column: diagnostic.location.col,
 
-        annotation_level: 'warning',
+        annotation_level: 'failure',
         message: diagnostic.description,
         title: `${diagnostic.category}: ${diagnostic.check_name}`
       }
