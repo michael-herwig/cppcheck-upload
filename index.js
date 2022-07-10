@@ -54,6 +54,7 @@ async function importPlist(file) {
     const annotations = await Promise.all(files.map(async (file) => {
       return await importPlist(file);
     })).then(annotations => { return annotations.flat(); });
+    const conclusion = files.length > 0 ? (annotations.length > 0 ? 'failure' : 'success') : 'skipped';
 
     const octokit = github.getOctokit(args.token);
     await octokit.rest.checks.create({
@@ -63,7 +64,7 @@ async function importPlist(file) {
 
       name: 'Cppcheck Upload',
       status: 'completed',
-      conclusion: 'success',
+      conclusion: conclusion,
 
       output: {
         title: `TODO Small Feedback`,
