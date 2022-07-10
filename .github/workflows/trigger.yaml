@@ -17,4 +17,4 @@ jobs:
       - uses: michael-herwig/cppcheck-upload@main
         name: Upload
         with:
-          path: ${{ github.workspace }}/test
+          path: test/
