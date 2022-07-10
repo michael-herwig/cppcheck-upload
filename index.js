@@ -53,22 +53,6 @@ async function importPlist(file) {
     const itoken = args.token;
     const ipath = args.path;
 
-    const octokit = github.getOctokit(args.token);
-    const checkrun = await octokit.rest.checks.create({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      head_sha: github.context.sha,
-
-      name: 'Cppcheck',
-      status: 'in_progress',
-
-      output: {
-        title: `TODO Small Feedback`,
-        summary: `TODO Build small summary!`
-      }
-    });
-    const checkrun_id = checkrun.data.id;
-
     const files = await collectPlistFiles(ipath);
     core.info(`Found ${files.length} .plist files:\n - ${files.join('\n - ')}`);
     const annotations = await Promise.all(files.map(async (file) => {
@@ -76,33 +60,76 @@ async function importPlist(file) {
     })).then(annotations => { return annotations.flat(); });
     core.info(`Found ${annotations.length} annotations:\n - ${annotations.map(annotation => annotation.title).join('\n - ')}`);
 
-    var uploads = [];
-    const max_annotations = 50;
-    for (var i = 0; i < annotations.length; i += max_annotations) {
-      const size = Math.min(max_annotations, annotations.length - i);
-      const batch = annotations.slice(i, i + size);
+    if (files.length === 0) {
+      await octokit.rest.checks.create({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        head_sha: github.context.sha,
 
-      uploads.push(octokit.rest.checks.update({
+        name: 'Cppcheck',
+        status: 'completed',
+        conclusion: 'skipped',
+      });
+    } else if (annotations.length === 0) {
+      await octokit.rest.checks.create({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        head_sha: github.context.sha,
+
+        name: 'Cppcheck',
+        status: 'completed',
+        conclusion: 'success',
+      });
+    } else {
+      const title = `${annotations.length} errors found in ${files.length} files`;
+      const summary = `TODO`;
+
+      const octokit = github.getOctokit(args.token);
+      const checkrun = await octokit.rest.checks.create({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        head_sha: github.context.sha,
+
+        name: 'Cppcheck',
+        status: 'in_progress',
+
+        output: {
+          title: title,
+          summary: summary
+        }
+      });
+      const checkrun_id = checkrun.data.id;
+
+      var uploads = [];
+      const max_annotations = 50;
+      for (var i = 0; i < annotations.length; i += max_annotations) {
+        const size = Math.min(max_annotations, annotations.length - i);
+        const batch = annotations.slice(i, i + size);
+
+        uploads.push(octokit.rest.checks.update({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          check_run_id: checkrun_id,
+
+          output: {
+            title: title,
+            summary: summary,
+            annotations: batch
+          }
+        }));
+      }
+      await Promise.all(uploads);
+
+      const conclusion = files.length > 0 ? (annotations.length > 0 ? 'failure' : 'success') : 'skipped';
+      await octokit.rest.checks.update({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         check_run_id: checkrun_id,
 
-        output: {
-          annotations: batch
-        }
-      }));
+        status: 'completed',
+        conclusion: conclusion
+      });
     }
-    await Promise.all(uploads);
-
-    const conclusion = files.length > 0 ? (annotations.length > 0 ? 'failure' : 'success') : 'skipped';
-    await octokit.rest.checks.update({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      check_run_id: checkrun_id,
-
-      status: 'completed',
-      conclusion: conclusion
-    });
   }
   catch (error) {
     core.setFailed(error.message);
