@@ -120,14 +120,18 @@ async function importPlist(file) {
       }
       await Promise.all(uploads);
 
-      const conclusion = files.length > 0 ? (annotations.length > 0 ? 'failure' : 'success') : 'skipped';
       await octokit.rest.checks.update({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         check_run_id: checkrun_id,
 
         status: 'completed',
-        conclusion: conclusion
+        conclusion: 'failure',
+
+        output: {
+          title: title,
+          summary: summary
+        }
       });
     }
   }
