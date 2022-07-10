@@ -70,6 +70,7 @@ async function importPlist(file) {
         status: 'completed',
         conclusion: 'skipped',
       });
+      core.info('No .plist files found, skipping check.');
     } else if (annotations.length === 0) {
       await octokit.rest.checks.create({
         owner: github.context.repo.owner,
@@ -80,6 +81,7 @@ async function importPlist(file) {
         status: 'completed',
         conclusion: 'success',
       });
+      core.info('No annotations found, completed with success.');
     } else {
       const title = `${annotations.length} errors found in ${files.length} files`;
       const summary = `TODO`;
@@ -103,6 +105,8 @@ async function importPlist(file) {
       var uploads = [];
       const max_annotations = 50;
       for (var i = 0; i < annotations.length; i += max_annotations) {
+        core.debug(`Uploading annotations ${i} to ${i + max_annotations}`);
+
         const size = Math.min(max_annotations, annotations.length - i);
         const batch = annotations.slice(i, i + size);
 
@@ -133,6 +137,7 @@ async function importPlist(file) {
           summary: summary
         }
       });
+      core.info(`Completed with failures.`);
     }
   }
   catch (error) {
