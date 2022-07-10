@@ -57,6 +57,8 @@ async function importPlist(file) {
     await octokit.rest.checks.create({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
+      head_sha: github.context.sha,
+
       name: 'Cppcheck Upload',
       status: 'completed',
       conclusion: 'success',
